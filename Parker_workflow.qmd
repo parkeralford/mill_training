@@ -1,0 +1,67 @@
+---
+title: "parker_training"
+format: html
+editor: visual
+---
+
+## Packages
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+```
+
+## Data Import
+```{r}
+claims <- read_csv("claims.csv")
+claims
+```
+
+## Data Cleaning
+```{r}
+claims_Billed <- claims %>%
+ filter(STATUS1 %in% "BILLED") %>%
+ filter(STATUS2 %in% "BILLED" | is.na(STATUS2)) %>%
+ filter(STATUSP %in% 
+ "BILLED")
+
+claims_clean <- claims %>%
+  filter(DEPARTMENTID >= 6L & DEPARTMENTID <= 20L)
+
+#Make split for dates
+claims.dates <- claims %>%
+  mutate(date = as.character(SERVICEDATE))
+claims.dates <- claims.dates %>%
+  mutate(date = as.Date(SERVICEDATE)) %>% 
+  separate(date, into = c("year", "month", "day_time"), sep = "-", remove = FALSE) %>%
+  separate(day_time, into = c("day", "time"), sep = " ", remove = TRUE) %>%
+  select(year, month)
+
+```
+
+## Data Visualization
+
+```{r}
+dv1 <- ggplot(claims_clean) +
+  aes(x = DEPARTMENTID) +
+  geom_histogram(bins = 30L, fill = "#112446") +
+  theme_minimal()
+
+ggplotly(dv1)
+
+#Graph dates
+dv2 <- ggplot(claims.dates) +
+  aes(x = year) +
+  geom_histogram(bins = 30L, fill = "#0000FF", stat="count") +
+  theme_minimal()
+
+ggplotly(dv2) 
+```
+
+## Data Analysis
+```{r}
+
+```
+
